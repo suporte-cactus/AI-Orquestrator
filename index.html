@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão de Custos e Produtividade</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .nav {
+            background: white;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .nav-btn.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .form-group.required label::after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 12px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 500;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .formula {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 10px 0;
+            border-left: 3px solid #007bff;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .scroll-table {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Sistema de Gestão de Custos e Produtividade</h1>
+            <p>Gestão integrada de centros de custo, colaboradores, equipamentos e produtividade</p>
+        </div>
+
+        <div class="nav">
+            <div class="nav-buttons">
+                <button class="nav-btn active" onclick="showSection('centros')">Centros de Custo</button>
+                <button class="nav-btn" onclick="showSection('colaboradores')">Colaboradores</button>
+                <button class="nav-btn" onclick="showSection('equipamentos')">Equipamentos</button>
+                <button class="nav-btn" onclick="showSection('rateio')">Rateio de Centros</button>
+                <button class="nav-btn" onclick="showSection('custos')">Custos Mensais</button>
+                <button class="nav-btn" onclick="showSection('produtividade')">Produtividade</button>
+            </div>
+        </div>
+
+        <!-- Centros de Custo -->
+        <div id="centros" class="section active">
+            <h2>Centros de Custo</h2>
+            <div class="info-box">
+                Base do sistema - Define as unidades organizacionais responsáveis por gerar ou incorrer em custos
+            </div>
+
+            <form id="form-centros">
+                <div class="form-grid">
+                    <div class="form-group required">
+                        <label>Nome</label>
+                        <input type="text" name="nome" required>
+                    </div>
+                    <div class="form-group required">
+                        <label>Código</label>
+                        <input type="text" name="codigo" required placeholder="Ex: CC001">
+                    </div>
+                    <div class="form-group required">
+                        <label>Tipo</label>
+                        <select name="tipo" required>
+                            <option value="">Selecione...</option>
+                            <option value="produtivo">Produtivo</option>
+                            <option value="administrativo">Administrativo</option>
+                            <option value="auxiliar">Auxiliar</option>
+                        </select>
+                    </div>
+                    <div class="form-group required">
+                        <label>Capacidade (Horas)</label>
+                        <input type="number" name="capacidade_horas" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Ativo</label>
+                        <select name="ativo">
+                            <option value="true">Sim</option>
+                            <option value="false">Não</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary">Cadastrar Centro</button>
+                    <button type="button" class="btn btn-secondary" onclick="clearForm('form-centros')">Limpar</button>
+                </div>
+            </form>
+
+            <div class="scroll-table">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nome</th>
+                            <th>Tipo</th>
+                            <th>Capacidade (h)</th>
+                            <th>Ativo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-centros">
+                        <!-- Dados serão inseridos aqui -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Colaboradores -->
+        <div id="colaboradores" class="section">
+            <h2>Colaboradores</h2>
+            <div class="info-box">
+                Registro de funcionários e seus custos. Cada colaborador deve estar associado a um Centro de Custo existente.
+            </div>
+            <div class="formula">
+                Fórmula: custo_hora = salario_base / jornada_horas_mensal
+            </div>
+
+            <form id="form-colaboradores">
+                <div class="form-grid">
+                    <div class="form-group required">
+                        <label>Nome</label>
+                        <input type="text" name="nome" required>
+                    </div>
+                    <div class="form-group required">
+                        <label>CPF</label>
+                        <input type="text" name="cpf" required placeholder="000.000.000-00">
+                    </div>
+                    <div class="form-group required">
+                        <label>Cargo</label>
+                        <input type="text" name="cargo" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Departamento</label>
+                        <input type="text" name="departamento">
+                    </div>
+                    <div class="form-group required">
+                        <label>Salário Base (R$)</label>
+                        <input type="number" name="salario_base" step="0.01" required>
+                    </div>
+                    <div class="form-group required">
+                        <label>Jornada (Horas/Mês)</label>
+                        <input type="number" name="jornada_horas_mensal" step="0.01" required>
+                    </div>
+                    <div class="form-group required">
+                        <label>Centro de Custo</label>
+                        <select name="centro_custo_id" required id="select-centro-custo">
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo</label>
+                        <select name="tipo">
+                            <option value="produtivo">Produtivo</option>
+                            <option value="administrativo">Administrativo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>% Alocação</label>
+                        <input type="number" name="percentual_alocacao" step="0.01" value="100">
+                    </div>
+                    <div class="form-group">
+                        <label>% Produtividade</label>
+                        <input type="number" name="produtividade_percentual" step="0.01" value="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Data Admissão</label>
+                        <input type="date" name="data_admissao">
+                    </div>
+                    <div class="form-group">
+                        <label>Custo/Hora (R$)</label>
+                        <input type="number" name="custo_hora" step="0.01" readonly>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary">Cadastrar Colaborador</button>
+                    <button type="button" class="btn btn-secondary" onclick="clearForm('form-colaboradores')">Limpar</button>
+                </div>
+            </form>
+
+            <div class="scroll-table">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>CPF</th>
+                            <th>Cargo</th>
+                            <th>Salário</th>
+                            <th>Jornada</th>
+                            <th>Custo/Hora</th>
+                            <th>Centro</th>
+                            <th>% Aloc.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-colaboradores">
+                        <!-- Dados serão inseridos aqui -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Equipamentos -->
+        <div id="equipamentos" class="section">
+            <h2>Equipamentos</h2>
+            <div class="info-box">
+                Máquinas e ferramentas operacionais. Devem ser vinculados a um Centro de Custo existente.
+            </div>
+            <div class="formula">
+                Fórmula: deprec_mensal = valor_aquisicao / (vida_util_anos * 12)
+            </div>
+
+            <form id="form-equipamentos">
+                <div class="form-grid">
+                    <div class="form-group required">
+                        <label>Código</label>
+                        <input type="text" name="codigo" required placeholder="Ex: EQP001">
+                    </div>
+                    <div class="form-group required">
+                        <label>Nome</label>
+                        <input type="text" name="nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Marca</label>
+                        <input type="text" name="marca">
+                    </div>
+                    <div class="form-group">
+                        <label>Modelo</label>
+                        <input type="text" name="modelo">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo Equipamento</label>
+                        <input type="text" name="tipo_equipamento" placeholder="Ex: impressora, corte">
+                    </div>
+                    <div class="form-group required">
+                        <label>Centro de Custo</label>
+                        <select name="centro_custo" required id="select-centro-custo-eq">
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Operador Principal</label>
+                        <input type="text" name="operador_principal">
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select name="status">
+                            <option value="operational">Operacional</option>
+                            <option value="maintenance">Manutenção</option>
+                            <option value="inactive">Inativo</option>
+                        </select>
+                    </div>
+                    <div class="form-group required">
+                        <label>Valor Aquisição (R$)</label>
+                        <input type="number" name="valor_aquisicao" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Vida Útil (Anos)</label>
+                        <input type="number" name="vida_util_anos" value="5" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>Depreciação Mensal (R$)</label>
+                        <input type="number" name="deprec_mensal" step="0.01" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Valor Hora RKW (R$)</label>
+                        <input type="number" name="valor_hora_rkw" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Usa Tinta</label>
+                        <select name="usa_tinta">
+                            <option value="false">Não</option>
+                            <option value="true">Sim</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Custo Tinta/Hora (R$)</label>
+                        <input type="number" name="custo_estimado_tinta_hora" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Largura Máxima (m)</label>
+                        <input type="number" name="largura_maxima_m" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Velocidade (m²/h)</label>
+                        <input type="number" name="velocidade_m2h" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Produtividade Linear (m/h)</label>
+                        <input type="number" name="produtividade_linear_mh" step="0.01">
+                    </div>
+                </div>
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary">Cadastrar Equipamento</button>
+                    <button type="button" class="btn btn-secondary" onclick="clearForm('form-equipamentos')">Limpar</button>
+                </div>
+            </form>
+
+            <div class="scroll-table">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nome</th>
+                            <th>Marca/Modelo</th>
+                            <th>Centro</th>
+                            <th>Valor Aquisição</th>
+                            <th>Deprec. Mensal</th>
+                            <th>Valor Hora RKW</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-equipamentos">
+                        <!-- Dados serão inseridos aqui -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Rateio de Centros -->
+        <div id="rateio" class="section">
+            <h2>Rateio de Centros</h2>
+            <div class="info-box">
+                Distribuição percentual de custos entre centros. Geralmente de centros administrativos/auxiliares para produtivos.
+            </div>
+
+            <form id="form-rateio">
+                <div class="form-grid">
+                    <div class="form-group required">
+                        <label>Centro Origem</label>
+                        <select name="centro_origem_id" required id="select-centro-origem">
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+                    <div class="form-group required">
+                        <label>Centro Destino</label>
+                        <select name="centro_destino_id" required id="select-centro-destino">
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+                    <div class="form-group required">
+                        <label>% Rateio</label>
+                        <input type="number" name="percentual_rateio" step="0.01" max="100" required>
+                    </div>
+                    <div class="form-group required">
+                        <label>Mês Referência</label>
+                        <input type="month" name="mes_referencia" required>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary">Cadastrar Rateio</button>
+                    <button type="button" class="btn btn-secondary" onclick="clearForm('form-rateio')">Limpar</button>
+                </div>
+            </form>
+
+            <div class="scroll-table">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Centro Origem</th>
+                            <th>Centro Destino</th>
+                            <th>% Rateio</th>
+                            <th>Mês Referência</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-rateio">
+                        <!-- Dados serão inseridos aqui -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Custos Mensais -->
+        <div id="custos" class="section">
+            <h2>Custos Mensais</h2>
+            <div class="info-box">
+                Consolidação dos custos mensais por centro. O valor/hora é calculado automaticamente.
+            </div>
+            <div class="formula">
+                Fórmula: valor_hora = (custo_total + valor_rateio_administrativo) / horas_disponiveis
+            </div>
+
+            <form id="form-custos">
+                <div class="form-grid">
+                    <div class="form-group required">
+                        <label>Centro de Custo</label>
+                        <select name="centro_custo_id" required id="select-centro-custo-custos">
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+                    <div class="form-group required">
+                        <label>Mês Referência</label>
+                        <input type="month" name="mes_referencia" required>
+                    </div>
+                    <div class="form-group required">
+                        <label>Custo Total (R$)</label>
+                        <input type="number" name="custo_total" step="0.01" required>
+                    </div>
+                    <div class="form-group required">
+                        <label>Horas Disponíveis</label>
+                        <input type="number" name="horas_disponiveis" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Valor Rateio Admin. (R$)</label>
+                        <input type="number" name="valor_rateio_administrativo" step="0.01" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Valor/Hora (R$)</label>
+                        <input type="number" name="valor_hora" step="0.01" readonly>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary">Cadastrar Custo Mensal</button>
+                    <button type="button" class="btn btn-secondary" onclick="clearForm('form-custos')">Limpar</button>
+                </div>
+            </form>
+
+            <div class="scroll-table">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Centro</th>
+                            <th>Mês</th>
+                            <th>Custo Total</th>
+                            <th>Horas Disp.</th>
+                            <th>Rateio Admin.</th>
+                            <th>Valor/Hora</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-custos">
+                        <!-- Dados serão inseridos aqui -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Produtividade Mensal -->
+        <div id="produtividade" class="section">
+            <h2>Produtividade Mensal</h2>
+            <div class="info-box">
+                Registro da produção mensal por centro e equipamento. Unidades: m² (metros quadrados), ml (mililitros/metros lineares), hora.
+            </div>
+
+            <form id="form-produtividade">
+                <div class="form-grid">
+                    <div class="form-group required">
+                        <label>Centro de Custo</label>
+                        <select name="centro_custo_id" required id="select-centro-custo-prod">
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Equipamento</label>
+                        <select name="equipamento_id" id="select-equipamento-prod">
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+                    <div class="form-group required">
+                        <label>Mês Referência</label>
+                        <input type="month" name="mes_referencia" required>
+                    </div>
+                    <div class="form-group required">
+                        <label>Unidade</label>
+                        <select name="unidade" required>
+                            <option value="">Selecione...</option>
+                            <option value="m2">m² (metros quadrados)</option>
+                            <option value="ml">ml (metros lineares)</option>
+                            <option value="hora">hora</option>
+                        </select>
+                    </div>
+                    <div class="form-group required">
+                        <label>Quantidade</label>
+                        <input type="number" name="quantidade" step="0.01" required>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary">Cadastrar Produtividade</button>
+                    <button type="button" class="btn btn-secondary" onclick="clearForm('form-produtividade')">Limpar</button>
+                </div>
+            </form>
+
+            <div class="scroll-table">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Centro</th>
+                            <th>Equipamento</th>
+                            <th>Mês</th>
+                            <th>Unidade</th>
+                            <th>Quantidade</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-produtividade">
+                        <!-- Dados serão inseridos aqui -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados em memória
+        let data = {
+            centros: [],
+            colaboradores: [],
+            equipamentos: [],
+            rateio: [],
+            custos: [],
+            produtividade: []
+        };
+
+        // Gerar ID único
+        function generateId() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // Mostrar seção
+        function showSection(sectionId) {
+            // Ocultar todas as seções
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remover classe active dos botões
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Mostrar seção selecionada
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Ativar botão correspondente
+            event.target.classList.add('active');
+            
+            // Atualizar selects dependentes
+            updateDependentSelects();
+        }
+
+        // Limpar formulário
+        function clearForm(formId) {
+            document.getElementById(formId).reset();
+        }
+
+        // Atualizar selects dependentes
+        function updateDependentSelects() {
+            // Atualizar select de centros de custo
+            const centroSelects = [
+                'select-centro-custo',
+                'select-centro-custo-eq', 
+                'select-centro-origem',
+                'select-centro-destino',
+                'select-centro-custo-custos',
+                'select-centro-custo-prod'
+            ];
+            
+            centroSelects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    // Manter primeira opção
+                    const firstOption = select.children[0];
+                    select.innerHTML = '';
+                    select.appendChild(firstOption);
+                    
+                    // Adicionar centros
+                    data.centros.forEach(centro => {
+                        const option = document.createElement('option');
+                        option.value = centro.id;
+                        option.textContent = `${centro.codigo} - ${centro.nome}`;
+                        select.appendChild(option);
+                    });
+                }
+            });
+
+            // Atualizar select de equipamentos
+            const equipSelect = document.getElementById('select-equipamento-prod');
+            if (equipSelect) {
+                const firstOption = equipSelect.children[0];
+                equipSelect.innerHTML = '';
+                equipSelect.appendChild(firstOption);
+                
+                data.equipamentos.forEach(equip => {
+                    const option = document.createElement('option');
+                    option.value = equip.id;
+                    option.textContent = `${equip.codigo} - ${equip.nome}`;
+                    equipSelect.appendChild(option);
+                });
+            }
+        }
+
+        // Calcular custo por hora do colaborador
+        function calculateCustoHora() {
+            const salario = parseFloat(document.querySelector('input[name="salario_base"]').value) || 0;
+            const jornada = parseFloat(document.querySelector('input[name="jornada_horas_mensal"]').value) || 1;
+            const custoHora = salario / jornada;
+            document.querySelector('input[name="custo_hora"]').value = custoHora.toFixed(2);
+        }
+
+        // Calcular depreciação mensal
+        function calculateDepreciacao() {
+            const valor = parseFloat(document.querySelector('input[name="valor_aquisicao"]').value) || 0;
+            const vida = parseFloat(document.querySelector('input[name="vida_util_anos"]').value) || 5;
+            const deprec = valor / (vida * 12);
+            document.querySelector('input[name="deprec_mensal"]').value = deprec.toFixed(2);
+        }
+
+        // Calcular valor por hora
+        function calculateValorHora() {
+            const custoTotal = parseFloat(document.querySelector('input[name="custo_total"]').value) || 0;
+            const rateio = parseFloat(document.querySelector('input[name="valor_rateio_administrativo"]').value) || 0;
+            const horas = parseFloat(document.querySelector('input[name="horas_disponiveis"]').value) || 1;
+            const valorHora = (custoTotal + rateio) / horas;
+            document.querySelector('input[name="valor_hora"]').value = valorHora.toFixed(2);
+        }
+
+        // Adicionar event listeners para cálculos automáticos
+        document.addEventListener('DOMContentLoaded', function() {
+            // Colaboradores - cálculo de custo hora
+            const salarioInput = document.querySelector('input[name="salario_base"]');
+            const jornadaInput = document.querySelector('input[name="jornada_horas_mensal"]');
+            
+            if (salarioInput && jornadaInput) {
+                salarioInput.addEventListener('input', calculateCustoHora);
+                jornadaInput.addEventListener('input', calculateCustoHora);
+            }
+
+            // Equipamentos - cálculo de depreciação
+            const valorInput = document.querySelector('input[name="valor_aquisicao"]');
+            const vidaInput = document.querySelector('input[name="vida_util_anos"]');
+            
+            if (valorInput && vidaInput) {
+                valorInput.addEventListener('input', calculateDepreciacao);
+                vidaInput.addEventListener('input', calculateDepreciacao);
+            }
+
+            // Custos mensais - cálculo de valor hora
+            const custoTotalInput = document.querySelector('input[name="custo_total"]');
+            const rateioInput = document.querySelector('input[name="valor_rateio_administrativo"]');
+            const horasInput = document.querySelector('input[name="horas_disponiveis"]');
+            
+            if (custoTotalInput && rateioInput && horasInput) {
+                custoTotalInput.addEventListener('input', calculateValorHora);
+                rateioInput.addEventListener('input', calculateValorHora);
+                horasInput.addEventListener('input', calculateValorHora);
+            }
+        });
+
+        // Handlers dos formulários
+        document.getElementById('form-centros').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const centro = {
+                id: generateId(),
+                nome: formData.get('nome'),
+                codigo: formData.get('codigo'),
+                tipo: formData.get('tipo'),
+                capacidade_horas: parseFloat(formData.get('capacidade_horas')),
+                ativo: formData.get('ativo') === 'true'
+            };
+            
+            data.centros.push(centro);
+            updateTable('centros');
+            updateDependentSelects();
+            this.reset();
+        });
+
+        document.getElementById('form-colaboradores').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const colaborador = {
+                id: generateId(),
+                nome: formData.get('nome'),
+                cpf: formData.get('cpf'),
+                cargo: formData.get('cargo'),
+                departamento: formData.get('departamento'),
+                salario_base: parseFloat(formData.get('salario_base')),
+                jornada_horas_mensal: parseFloat(formData.get('jornada_horas_mensal')),
+                centro_custo_id: formData.get('centro_custo_id'),
+                tipo: formData.get('tipo'),
+                percentual_alocacao: parseFloat(formData.get('percentual_alocacao')),
+                produtividade_percentual: parseFloat(formData.get('produtividade_percentual')),
+                data_admissao: formData.get('data_admissao'),
+                custo_hora: parseFloat(formData.get('custo_hora'))
+            };
+            
+            data.colaboradores.push(colaborador);
+            updateTable('colaboradores');
+            this.reset();
+        });
+
+        document.getElementById('form-equipamentos').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const equipamento = {
+                id: generateId(),
+                codigo: formData.get('codigo'),
+                nome: formData.get('nome'),
+                marca: formData.get('marca'),
+                modelo: formData.get('modelo'),
+                tipo_equipamento: formData.get('tipo_equipamento'),
+                centro_custo: formData.get('centro_custo'),
+                operador_principal: formData.get('operador_principal'),
+                status: formData.get('status'),
+                valor_aquisicao: parseFloat(formData.get('valor_aquisicao')),
+                vida_util_anos: parseFloat(formData.get('vida_util_anos')),
+                deprec_mensal: parseFloat(formData.get('deprec_mensal')),
+                valor_hora_rkw: parseFloat(formData.get('valor_hora_rkw')),
+                usa_tinta: formData.get('usa_tinta') === 'true',
+                custo_estimado_tinta_hora: parseFloat(formData.get('custo_estimado_tinta_hora')),
+                largura_maxima_m: parseFloat(formData.get('largura_maxima_m')),
+                velocidade_m2h: parseFloat(formData.get('velocidade_m2h')),
+                produtividade_linear_mh: parseFloat(formData.get('produtividade_linear_mh'))
+            };
+            
+            data.equipamentos.push(equipamento);
+            updateTable('equipamentos');
+            updateDependentSelects();
+            this.reset();
+        });
+
+        document.getElementById('form-rateio').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const rateio = {
+                id: generateId(),
+                centro_origem_id: formData.get('centro_origem_id'),
+                centro_destino_id: formData.get('centro_destino_id'),
+                percentual_rateio: parseFloat(formData.get('percentual_rateio')),
+                mes_referencia: formData.get('mes_referencia')
+            };
+            
+            data.rateio.push(rateio);
+            updateTable('rateio');
+            this.reset();
+        });
+
+        document.getElementById('form-custos').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const custo = {
+                id: generateId(),
+                centro_custo_id: formData.get('centro_custo_id'),
+                mes_referencia: formData.get('mes_referencia'),
+                custo_total: parseFloat(formData.get('custo_total')),
+                horas_disponiveis: parseFloat(formData.get('horas_disponiveis')),
+                valor_rateio_administrativo: parseFloat(formData.get('valor_rateio_administrativo')),
+                valor_hora: parseFloat(formData.get('valor_hora'))
+            };
+            
+            data.custos.push(custo);
+            updateTable('custos');
+            this.reset();
+        });
+
+        document.getElementById('form-produtividade').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const produtividade = {
+                id: generateId(),
+                centro_custo_id: formData.get('centro_custo_id'),
+                equipamento_id: formData.get('equipamento_id'),
+                mes_referencia: formData.get('mes_referencia'),
+                unidade: formData.get('unidade'),
+                quantidade: parseFloat(formData.get('quantidade'))
+            };
+            
+            data.produtividade.push(produtividade);
+            updateTable('produtividade');
+            this.reset();
+        });
+
+        // Atualizar tabelas
+        function updateTable(type) {
+            const tbody = document.getElementById(`table-${type}`);
+            tbody.innerHTML = '';
+
+            data[type].forEach(item => {
+                const row = document.createElement('tr');
+                
+                switch(type) {
+                    case 'centros':
+                        row.innerHTML = `
+                            <td>${item.codigo}</td>
+                            <td>${item.nome}</td>
+                            <td>${item.tipo}</td>
+                            <td>${item.capacidade_horas}</td>
+                            <td>${item.ativo ? 'Sim' : 'Não'}</td>
+                        `;
+                        break;
+                    
+                    case 'colaboradores':
+                        const centro = data.centros.find(c => c.id === item.centro_custo_id);
+                        row.innerHTML = `
+                            <td>${item.nome}</td>
+                            <td>${item.cpf}</td>
+                            <td>${item.cargo}</td>
+                            <td>R$ ${item.salario_base.toFixed(2)}</td>
+                            <td>${item.jornada_horas_mensal}h</td>
+                            <td>R$ ${item.custo_hora.toFixed(2)}</td>
+                            <td>${centro ? centro.codigo : '-'}</td>
+                            <td>${item.percentual_alocacao}%</td>
+                        `;
+                        break;
+                    
+                    case 'equipamentos':
+                        const centroEq = data.centros.find(c => c.id === item.centro_custo);
+                        row.innerHTML = `
+                            <td>${item.codigo}</td>
+                            <td>${item.nome}</td>
+                            <td>${item.marca} ${item.modelo}</td>
+                            <td>${centroEq ? centroEq.codigo : '-'}</td>
+                            <td>R$ ${item.valor_aquisicao.toFixed(2)}</td>
+                            <td>R$ ${item.deprec_mensal.toFixed(2)}</td>
+                            <td>R$ ${(item.valor_hora_rkw || 0).toFixed(2)}</td>
+                            <td>${item.status}</td>
+                        `;
+                        break;
+                    
+                    case 'rateio':
+                        const origem = data.centros.find(c => c.id === item.centro_origem_id);
+                        const destino = data.centros.find(c => c.id === item.centro_destino_id);
+                        row.innerHTML = `
+                            <td>${origem ? origem.nome : '-'}</td>
+                            <td>${destino ? destino.nome : '-'}</td>
+                            <td>${item.percentual_rateio}%</td>
+                            <td>${item.mes_referencia}</td>
+                        `;
+                        break;
+                    
+                    case 'custos':
+                        const centroCusto = data.centros.find(c => c.id === item.centro_custo_id);
+                        row.innerHTML = `
+                            <td>${centroCusto ? centroCusto.nome : '-'}</td>
+                            <td>${item.mes_referencia}</td>
+                            <td>R$ ${item.custo_total.toFixed(2)}</td>
+                            <td>${item.horas_disponiveis}h</td>
+                            <td>R$ ${item.valor_rateio_administrativo.toFixed(2)}</td>
+                            <td>R$ ${item.valor_hora.toFixed(2)}</td>
+                        `;
+                        break;
+                    
+                    case 'produtividade':
+                        const centroProd = data.centros.find(c => c.id === item.centro_custo_id);
+                        const equipProd = data.equipamentos.find(e => e.id === item.equipamento_id);
+                        row.innerHTML = `
+                            <td>${centroProd ? centroProd.nome : '-'}</td>
+                            <td>${equipProd ? equipProd.nome : '-'}</td>
+                            <td>${item.mes_referencia}</td>
+                            <td>${item.unidade}</td>
+                            <td>${item.quantidade}</td>
+                        `;
+                        break;
+                }
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // Carregar dados de exemplo
+        function loadSampleData() {
+            // Centros de custo
+            data.centros = [
+                {
+                    id: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
+                    nome: 'Impressão Digital',
+                    codigo: 'CC001',
+                    tipo: 'produtivo',
+                    capacidade_horas: 440.00,
+                    ativo: true
+                },
+                {
+                    id: 'b2c3d4e5-f6a7-8901-2345-67890abcdef0',
+                    nome: 'Administrativo',
+                    codigo: 'CC002',
+                    tipo: 'administrativo',
+                    capacidade_horas: 220.00,
+                    ativo: true
+                },
+                {
+                    id: 'c3d4e5f6-a7b8-9012-3456-7890abcdef12',
+                    nome: 'Manutenção',
+                    codigo: 'CC003',
+                    tipo: 'auxiliar',
+                    capacidade_horas: 160.00,
+                    ativo: true
+                }
+            ];
+
+            // Colaboradores
+            data.colaboradores = [
+                {
+                    id: 'd4e5f6a7-b8c9-0123-4567-890abcdef234',
+                    nome: 'João Silva',
+                    cpf: '111.222.333-44',
+                    cargo: 'Operador Impressora',
+                    departamento: 'Produção',
+                    salario_base: 5000.00,
+                    jornada_horas_mensal: 220.00,
+                    centro_custo_id: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
+                    tipo: 'produtivo',
+                    percentual_alocacao: 100.00,
+                    produtividade_percentual: 95.00,
+                    data_admissao: '2022-01-15',
+                    custo_hora: 22.73
+                },
+                {
+                    id: 'e5f6a7b8-c9d0-1234-5678-90abcdef3456',
+                    nome: 'Maria Santos',
+                    cpf: '555.666.777-88',
+                    cargo: 'Analista Financeiro',
+                    departamento: 'Financeiro',
+                    salario_base: 3000.00,
+                    jornada_horas_mensal: 220.00,
+                    centro_custo_id: 'b2c3d4e5-f6a7-8901-2345-67890abcdef0',
+                    tipo: 'administrativo',
+                    percentual_alocacao: 100.00,
+                    produtividade_percentual: 100.00,
+                    data_admissao: '2021-03-01',
+                    custo_hora: 13.64
+                }
+            ];
+
+            // Atualizar tabelas
+            updateTable('centros');
+            updateTable('colaboradores');
+            updateDependentSelects();
+        }
+
+        // Carregar dados de exemplo ao inicializar
+        document.addEventListener('DOMContentLoaded', loadSampleData);
+    </script>
+</body>
+</html>
